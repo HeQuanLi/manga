@@ -26,6 +26,10 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     _scrollController.addListener(_onScroll);
+    // 加载搜索历史
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AnimeProvider>().loadSearchHistory();
+    });
   }
 
   @override
@@ -60,6 +64,8 @@ class _SearchScreenState extends State<SearchScreen> {
     if (isNewSearch) {
       _currentPage = 1;
       _lastQuery = query;
+      // 添加到搜索历史
+      context.read<AnimeProvider>().addToSearchHistory(query);
       context.read<AnimeProvider>().searchAnime(query, _currentPage);
     }
   }
@@ -85,6 +91,8 @@ class _SearchScreenState extends State<SearchScreen> {
           child: TextField(
             controller: _searchController,
             focusNode: _focusNode,
+            autofocus: false,
+            enableInteractiveSelection: true,
             decoration: InputDecoration(
               hintText: '搜索动漫...',
               hintStyle: TextStyle(color: Colors.grey[400]),
@@ -93,12 +101,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   ? IconButton(
                       icon: Icon(Icons.clear, color: Colors.grey[600]),
                       onPressed: () {
+                        // 取消防抖
+                        _debounce?.cancel();
+                        // 清空输入框
                         _searchController.clear();
-                        context.read<AnimeProvider>().clearSearchResults();
+                        // 重置状态
                         setState(() {
                           _lastQuery = '';
                           _currentPage = 1;
                         });
+                        // 清空搜索结果
+                        context.read<AnimeProvider>().clearSearchResults();
+                        // 取消焦点，收起键盘
+                        _focusNode.unfocus();
                       },
                     )
                   : null,
@@ -123,19 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
           }
 
           if (provider.searchResults.isEmpty && _lastQuery.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text(
-                    '输入关键词搜索动漫',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
+            return _buildSearchHistory();
           }
 
           if (provider.searchResults.isEmpty) {
@@ -205,6 +208,121 @@ class _SearchScreenState extends State<SearchScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildSearchHistory() {
+    return Consumer<AnimeProvider>(
+      builder: (context, provider, child) {
+        if (provider.searchHistory.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.search, size: 64, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  '输入关键词搜索动漫',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 搜索历史头部
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '搜索历史',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('确认清空'),
+                          content: const Text('确定要清空所有搜索历史吗?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('取消'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('确定'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true && mounted) {
+                        await provider.clearSearchHistory();
+                      }
+                    },
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    label: const Text('清空'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey[600],
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 搜索历史列表
+            Expanded(
+              child: ListView.builder(
+                itemCount: provider.searchHistory.length,
+                itemBuilder: (context, index) {
+                  final query = provider.searchHistory[index];
+                  return ListTile(
+                    leading: Icon(
+                      Icons.history,
+                      color: Colors.grey[600],
+                    ),
+                    title: Text(query),
+                    trailing: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.grey[600],
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        provider.removeSearchHistory(query);
+                      },
+                    ),
+                    onTap: () {
+                      // 取消防抖，避免重复搜索
+                      _debounce?.cancel();
+                      // 设置搜索文本
+                      _searchController.text = query;
+                      // 执行搜索
+                      _performSearch(isNewSearch: true);
+                      // 请求焦点，让用户可以继续编辑
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        if (mounted) {
+                          _focusNode.requestFocus();
+                        }
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

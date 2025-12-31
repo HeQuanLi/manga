@@ -17,13 +17,16 @@ class AnimeProvider with ChangeNotifier {
   AnimeDetailBean? _currentDetail;
   VideoBean? _currentVideo;
   List<HistoryBean> _playHistory = [];
+  List<String> _searchHistory = [];
 
   bool _isLoading = false;
   String? _error;
   bool _hasReachedMax = false;
 
   static const String _historyKey = 'play_history';
+  static const String _searchHistoryKey = 'search_history';
   static const int _maxHistoryItems = 100;
+  static const int _maxSearchHistoryItems = 10;
 
   List<HomeBean> get homeSections => _homeSections;
   Map<int, List<AnimeBean>> get weekData => _weekData;
@@ -31,6 +34,7 @@ class AnimeProvider with ChangeNotifier {
   AnimeDetailBean? get currentDetail => _currentDetail;
   VideoBean? get currentVideo => _currentVideo;
   List<HistoryBean> get playHistory => _playHistory;
+  List<String> get searchHistory => _searchHistory;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasReachedMax => _hasReachedMax;
@@ -225,6 +229,75 @@ class AnimeProvider with ChangeNotifier {
       await prefs.setString(_historyKey, historyJson);
     } catch (e) {
       debugPrint('保存历史记录失败: $e');
+    }
+  }
+
+  // 搜索历史管理
+  Future<void> loadSearchHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyJson = prefs.getStringList(_searchHistoryKey);
+
+      if (historyJson != null) {
+        _searchHistory = historyJson;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('加载搜索历史失败: $e');
+    }
+  }
+
+  Future<void> addToSearchHistory(String query) async {
+    try {
+      final trimmedQuery = query.trim();
+      if (trimmedQuery.isEmpty) return;
+
+      // 移除相同的旧记录
+      _searchHistory.remove(trimmedQuery);
+
+      // 添加到列表开头
+      _searchHistory.insert(0, trimmedQuery);
+
+      // 限制搜索历史数量
+      if (_searchHistory.length > _maxSearchHistoryItems) {
+        _searchHistory = _searchHistory.sublist(0, _maxSearchHistoryItems);
+      }
+
+      // 保存到本地存储
+      await _saveSearchHistory();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('添加搜索历史失败: $e');
+    }
+  }
+
+  Future<void> removeSearchHistory(String query) async {
+    try {
+      _searchHistory.remove(query);
+      await _saveSearchHistory();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('删除搜索历史失败: $e');
+    }
+  }
+
+  Future<void> clearSearchHistory() async {
+    try {
+      _searchHistory.clear();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_searchHistoryKey);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('清空搜索历史失败: $e');
+    }
+  }
+
+  Future<void> _saveSearchHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_searchHistoryKey, _searchHistory);
+    } catch (e) {
+      debugPrint('保存搜索历史失败: $e');
     }
   }
 
