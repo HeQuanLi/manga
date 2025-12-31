@@ -8,11 +8,17 @@ import '../../providers/anime_provider.dart';
 class PlayerScreen extends StatefulWidget {
   final String episodeUrl;
   final String episodeName;
+  final String animeTitle;
+  final String animeImg;
+  final String animeUrl;
 
   const PlayerScreen({
     super.key,
     required this.episodeUrl,
     required this.episodeName,
+    required this.animeTitle,
+    required this.animeImg,
+    required this.animeUrl,
   });
 
   @override
@@ -80,6 +86,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
           setState(() {
             _isInitialized = true;
           });
+
+          // 记录播放历史
+          await provider.addToHistory(
+            animeTitle: widget.animeTitle,
+            animeImg: widget.animeImg,
+            animeUrl: widget.animeUrl,
+            episodeName: widget.episodeName,
+            episodeUrl: widget.episodeUrl,
+          );
         }
       }
     } catch (e) {

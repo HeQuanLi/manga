@@ -228,46 +228,55 @@ class _DetailScreenState extends State<DetailScreen>
   }
 
   Widget _buildEpisodeGrid(List episodes) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        childAspectRatio: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: episodes.length,
-      itemBuilder: (context, index) {
-        final episode = episodes.reversed.elementAt(index);
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PlayerScreen(
-                  episodeUrl: episode.url,
-                  episodeName: episode.name,
+    return Consumer<AnimeProvider>(
+      builder: (context, provider, child) {
+        final detail = provider.currentDetail;
+
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            childAspectRatio: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: episodes.length,
+          itemBuilder: (context, index) {
+            final episode = episodes.reversed.elementAt(index);
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlayerScreen(
+                      episodeUrl: episode.url,
+                      episodeName: episode.name,
+                      animeTitle: detail?.title ?? widget.title,
+                      animeImg: detail?.imgUrl ?? '',
+                      animeUrl: widget.detailUrl,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey[400]!,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[100],
+                ),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Text(
+                  episode.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
                 ),
               ),
             );
           },
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey[400]!,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey[100],
-            ),
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Text(
-              episode.name,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ),
         );
       },
     );

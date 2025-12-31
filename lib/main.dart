@@ -4,6 +4,7 @@ import 'providers/anime_provider.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/week/week_screen.dart';
 import 'screens/search/search_screen.dart';
+import 'screens/profile/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,6 +51,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     WeekScreen(),
     SearchScreen(),
+    ProfileScreen(),
   ];
 
   final List<NavigationDestination> _destinations = const [
@@ -68,13 +70,19 @@ class _MainScreenState extends State<MainScreen> {
       selectedIcon: Icon(Icons.search),
       label: '搜索',
     ),
+    NavigationDestination(
+      icon: Icon(Icons.person_outline),
+      selectedIcon: Icon(Icons.person),
+      label: '我的',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _currentIndex != 2
-          ? AppBar(
+      appBar: _currentIndex == 2 || _currentIndex == 3
+          ? null
+          : AppBar(
               title: Text(
                 _currentIndex == 0 ? '动漫之家' : '每周更新',
                 style: const TextStyle(
@@ -82,8 +90,7 @@ class _MainScreenState extends State<MainScreen> {
                   fontSize: 20,
                 ),
               ),
-            )
-          : null,
+            ),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
