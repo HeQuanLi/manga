@@ -16,6 +16,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
   String _lastQuery = '';
   Timer? _debounce;
   int _currentPage = 1;
@@ -34,6 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _searchController.dispose();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -82,6 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           child: TextField(
             controller: _searchController,
+            focusNode: _focusNode,
             decoration: InputDecoration(
               hintText: '搜索动漫...',
               hintStyle: TextStyle(color: Colors.grey[400]),

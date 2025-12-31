@@ -98,6 +98,8 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
+          // 切换页面时取消键盘焦点
+          FocusScope.of(context).unfocus();
           setState(() {
             _currentIndex = index;
           });

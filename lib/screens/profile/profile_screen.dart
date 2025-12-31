@@ -41,6 +41,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 确保进入该页面时取消所有焦点，防止其他页面的输入框弹出键盘
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
