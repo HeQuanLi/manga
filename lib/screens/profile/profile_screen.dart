@@ -80,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // 历史记录头部
               Container(
+                height: 40,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 color: Colors.grey[100],
                 child: Row(
