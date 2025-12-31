@@ -74,27 +74,36 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: '搜索动漫...',
-            border: InputBorder.none,
-            hintStyle: const TextStyle(color: Colors.white70),
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.white70),
-                    onPressed: () {
-                      _searchController.clear();
-                      context.read<AnimeProvider>().clearSearchResults();
-                      setState(() {
-                        _lastQuery = '';
-                        _currentPage = 1;
-                      });
-                    },
-                  )
-                : null,
+        title: Container(
+          height: 44,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22),
           ),
-          style: const TextStyle(color: Colors.white),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: '搜索动漫...',
+              hintStyle: TextStyle(color: Colors.grey[400]),
+              prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear, color: Colors.grey[600]),
+                      onPressed: () {
+                        _searchController.clear();
+                        context.read<AnimeProvider>().clearSearchResults();
+                        setState(() {
+                          _lastQuery = '';
+                          _currentPage = 1;
+                        });
+                      },
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            style: const TextStyle(color: Colors.black87, fontSize: 16),
+          ),
         ),
       ),
       body: Consumer<AnimeProvider>(

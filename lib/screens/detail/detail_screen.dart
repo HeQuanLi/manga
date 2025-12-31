@@ -20,7 +20,8 @@ class DetailScreen extends StatefulWidget {
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderStateMixin {
+class _DetailScreenState extends State<DetailScreen>
+    with SingleTickerProviderStateMixin {
   TabController? _tabController;
   int _selectedChannel = 0;
 
@@ -42,7 +43,10 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
       ),
       body: Consumer<AnimeProvider>(
         builder: (context, provider, child) {
@@ -85,21 +89,21 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
                     CachedNetworkImage(
                       imageUrl: detail.imgUrl,
                       width: double.infinity,
-                      height: 300,
+                      height: 200,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
-                        height: 300,
+                        height: 200,
                         color: Colors.grey[300],
                         child: const Center(child: CircularProgressIndicator()),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        height: 300,
+                        height: 200,
                         color: Colors.grey[300],
                         child: const Icon(Icons.error),
                       ),
                     ),
                     Container(
-                      height: 300,
+                      height: 200,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -114,20 +118,20 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         detail.title,
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Wrap(
-                        spacing: 8,
+                        spacing: 4,
                         children: detail.tags
                             .map((tag) => Chip(
                                   label: Text(tag),
@@ -136,25 +140,25 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
                                 ))
                             .toList(),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 4),
                       Text(
-                        detail.desc,
+                        detail.desc
+                            .replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
                         style: const TextStyle(fontSize: 14),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 4),
                       const Text(
                         '选集',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 16),
                       if (detail.channels.isNotEmpty) ...[
                         if (detail.channels.length > 1)
                           TabBar(
                             controller: _tabController,
-                            isScrollable: true,
+                            isScrollable: false,
                             labelColor: Theme.of(context).primaryColor,
                             unselectedLabelColor: Colors.grey,
                             tabs: List.generate(
@@ -190,7 +194,8 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
                               return SizedBox(
                                 width: 140,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
                                   child: AnimeCard(
                                     anime: anime,
                                     onTap: () {
@@ -232,9 +237,9 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
       ),
       itemCount: episodes.length,
       itemBuilder: (context, index) {
-        final episode = episodes[index];
-        return OutlinedButton(
-          onPressed: () {
+        final episode = episodes.reversed.elementAt(index);
+        return InkWell(
+          onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -245,10 +250,23 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
               ),
             );
           },
-          child: Text(
-            episode.name,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey[400]!,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[100],
+            ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Text(
+              episode.name,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
           ),
         );
       },
