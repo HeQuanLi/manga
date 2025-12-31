@@ -100,6 +100,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   controller: _scrollController,
                   padding: const EdgeInsets.all(8),
                   physics: const BouncingScrollPhysics(),
+                  cacheExtent: 500,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     childAspectRatio: 0.6,
@@ -109,19 +110,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   itemCount: provider.categoryResults.length,
                   itemBuilder: (context, index) {
                     final anime = provider.categoryResults[index];
-                    return AnimeCard(
-                      anime: anime,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailScreen(
-                              detailUrl: anime.url,
-                              title: anime.title,
+                    return RepaintBoundary(
+                      child: AnimeCard(
+                        anime: anime,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailScreen(
+                                detailUrl: anime.url,
+                                title: anime.title,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
