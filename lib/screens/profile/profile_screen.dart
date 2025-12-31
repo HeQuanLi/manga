@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   itemBuilder: (context, index) {
                     final history = provider.playHistory[index];
                     return Dismissible(
-                      key: Key(history.episodeUrl),
+                      key: Key(history.animeUrl),
                       direction: DismissDirection.endToStart,
                       background: Container(
                         color: Colors.red,
@@ -146,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       onDismissed: (direction) {
-                        provider.removeHistory(history.episodeUrl);
+                        provider.removeHistory(history.animeUrl);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('已删除')),
                         );
@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
-                                        history.episodeName,
+                                        '看到 ${history.lastEpisodeName}',
                                         style: TextStyle(
                                           fontSize: 13,
                                           color: Theme.of(context).primaryColor,

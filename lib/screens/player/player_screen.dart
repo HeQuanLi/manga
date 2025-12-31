@@ -93,7 +93,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
             animeImg: widget.animeImg,
             animeUrl: widget.animeUrl,
             episodeName: widget.episodeName,
-            episodeUrl: widget.episodeUrl,
           );
         }
       }

@@ -166,19 +166,17 @@ class AnimeProvider with ChangeNotifier {
     required String animeImg,
     required String animeUrl,
     required String episodeName,
-    required String episodeUrl,
   }) async {
     try {
-      // 移除相同集数的旧记录
-      _playHistory.removeWhere((item) => item.episodeUrl == episodeUrl);
+      // 移除相同动漫的旧记录（以 animeUrl 为唯一标识）
+      _playHistory.removeWhere((item) => item.animeUrl == animeUrl);
 
       // 添加新记录到列表开头
       final newHistory = HistoryBean(
         animeTitle: animeTitle,
         animeImg: animeImg,
         animeUrl: animeUrl,
-        episodeName: episodeName,
-        episodeUrl: episodeUrl,
+        lastEpisodeName: episodeName,
         watchedAt: DateTime.now(),
       );
 
@@ -197,9 +195,9 @@ class AnimeProvider with ChangeNotifier {
     }
   }
 
-  Future<void> removeHistory(String episodeUrl) async {
+  Future<void> removeHistory(String animeUrl) async {
     try {
-      _playHistory.removeWhere((item) => item.episodeUrl == episodeUrl);
+      _playHistory.removeWhere((item) => item.animeUrl == animeUrl);
       await _saveHistory();
       notifyListeners();
     } catch (e) {

@@ -2,16 +2,14 @@ class HistoryBean {
   final String animeTitle;
   final String animeImg;
   final String animeUrl;
-  final String episodeName;
-  final String episodeUrl;
+  final String lastEpisodeName;
   final DateTime watchedAt;
 
   HistoryBean({
     required this.animeTitle,
     required this.animeImg,
     required this.animeUrl,
-    required this.episodeName,
-    required this.episodeUrl,
+    required this.lastEpisodeName,
     required this.watchedAt,
   });
 
@@ -20,8 +18,7 @@ class HistoryBean {
       'animeTitle': animeTitle,
       'animeImg': animeImg,
       'animeUrl': animeUrl,
-      'episodeName': episodeName,
-      'episodeUrl': episodeUrl,
+      'lastEpisodeName': lastEpisodeName,
       'watchedAt': watchedAt.toIso8601String(),
     };
   }
@@ -31,14 +28,13 @@ class HistoryBean {
       animeTitle: json['animeTitle'] ?? '',
       animeImg: json['animeImg'] ?? '',
       animeUrl: json['animeUrl'] ?? '',
-      episodeName: json['episodeName'] ?? '',
-      episodeUrl: json['episodeUrl'] ?? '',
+      lastEpisodeName: json['lastEpisodeName'] ?? json['episodeName'] ?? '',
       watchedAt: DateTime.parse(json['watchedAt']),
     );
   }
 
   @override
   String toString() {
-    return 'HistoryBean{animeTitle: $animeTitle, episodeName: $episodeName, watchedAt: $watchedAt}';
+    return 'HistoryBean{animeTitle: $animeTitle, lastEpisodeName: $lastEpisodeName, watchedAt: $watchedAt}';
   }
 }
