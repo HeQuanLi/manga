@@ -74,14 +74,14 @@ class AnimeCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 6),
               child: Text(
                 anime.title,
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
