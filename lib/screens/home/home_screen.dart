@@ -40,67 +40,73 @@ class _HomeScreenState extends State<HomeScreen> {
           return RefreshIndicator(
             onRefresh: () => provider.loadHomeData(),
             child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              cacheExtent: 500,
               itemCount: provider.homeSections.length,
               itemBuilder: (context, index) {
                 final section = provider.homeSections[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            section.title
-                                .replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (section.moreUrl.isNotEmpty)
-                            const Text(
-                              '更多>',
-                              style: TextStyle(
+                return RepaintBoundary(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              section.title
+                                  .replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
+                              style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
                                 fontWeight: FontWeight.bold,
                               ),
-                            )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 167,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: section.animes.length,
-                        itemBuilder: (context, animeIndex) {
-                          final anime = section.animes[animeIndex];
-                          return Container(
-                            margin: EdgeInsets.only(left: 4),
-                            width: 120,
-                            child: AnimeCard(
-                              anime: anime,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DetailScreen(
-                                      detailUrl: anime.url,
-                                      title: anime.title,
-                                    ),
-                                  ),
-                                );
-                              },
                             ),
-                          );
-                        },
+                            if (section.moreUrl.isNotEmpty)
+                              const Text(
+                                '更多>',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      SizedBox(
+                        height: 167,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          cacheExtent: 300,
+                          itemCount: section.animes.length,
+                          itemBuilder: (context, animeIndex) {
+                            final anime = section.animes[animeIndex];
+                            return Container(
+                              margin: const EdgeInsets.only(left: 4),
+                              width: 120,
+                              child: AnimeCard(
+                                anime: anime,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailScreen(
+                                        detailUrl: anime.url,
+                                        title: anime.title,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 );
               },
             ),
