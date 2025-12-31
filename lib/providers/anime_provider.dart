@@ -14,6 +14,7 @@ class AnimeProvider with ChangeNotifier {
   List<HomeBean> _homeSections = [];
   Map<int, List<AnimeBean>> _weekData = {};
   List<AnimeBean> _searchResults = [];
+  List<AnimeBean> _categoryResults = [];
   AnimeDetailBean? _currentDetail;
   VideoBean? _currentVideo;
   List<HistoryBean> _playHistory = [];
@@ -31,6 +32,7 @@ class AnimeProvider with ChangeNotifier {
   List<HomeBean> get homeSections => _homeSections;
   Map<int, List<AnimeBean>> get weekData => _weekData;
   List<AnimeBean> get searchResults => _searchResults;
+  List<AnimeBean> get categoryResults => _categoryResults;
   AnimeDetailBean? get currentDetail => _currentDetail;
   VideoBean? get currentVideo => _currentVideo;
   List<HistoryBean> get playHistory => _playHistory;
@@ -143,6 +145,52 @@ class AnimeProvider with ChangeNotifier {
 
   void clearSearchResults() {
     _searchResults = [];
+    _hasReachedMax = false;
+    notifyListeners();
+  }
+
+  Future<void> loadCategoryData(String categoryUrl, int page) async {
+    _setLoading(true);
+    _error = null;
+    _hasReachedMax = false;
+
+    try {
+      _categoryResults = await _source.getCategoryData(categoryUrl, page);
+      if (_categoryResults.isEmpty) {
+        _hasReachedMax = true;
+      }
+      notifyListeners();
+    } catch (e) {
+      _error = _parseError(e);
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> loadMoreCategory(String categoryUrl, int page) async {
+    if (_isLoading || _hasReachedMax) return;
+
+    _setLoading(true);
+
+    try {
+      final newResults = await _source.getCategoryData(categoryUrl, page);
+      if (newResults.isEmpty) {
+        _hasReachedMax = true;
+      } else {
+        _categoryResults.addAll(newResults);
+      }
+      notifyListeners();
+    } catch (e) {
+      _error = '加载更多失败：${_parseError(e)}';
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void clearCategoryResults() {
+    _categoryResults = [];
     _hasReachedMax = false;
     notifyListeners();
   }

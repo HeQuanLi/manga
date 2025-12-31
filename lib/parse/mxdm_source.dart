@@ -139,6 +139,33 @@ class MxdmSource implements AnimeSource {
     return weekMap;
   }
 
+  Future<List<AnimeBean>> getCategoryData(String categoryUrl, int page) async {
+    final url = categoryUrl.contains('?')
+        ? '$categoryUrl&page=$page'
+        : '$categoryUrl?page=$page';
+    final source = await DownloadManager.getHtml('$baseUrl/$url');
+    final document = html_parser.parse(source);
+
+    final animeList = <AnimeBean>[];
+    // 尝试获取网格布局的动漫列表
+    final moduleItems = document.querySelectorAll('div.module-item');
+
+    if (moduleItems.isNotEmpty) {
+      return _getAnimeList(moduleItems);
+    }
+
+    // 如果没有找到，尝试搜索页面的布局
+    final searchItems = document.querySelectorAll('div.module-search-item');
+    for (var el in searchItems) {
+      final title = el.querySelector('h3')?.text ?? '';
+      final url = el.querySelector('h3 > a')?.attributes['href'] ?? '';
+      final imgUrl = el.querySelector('img')?.attributes['data-src'] ?? '';
+      animeList.add(AnimeBean(title: title, img: imgUrl, url: url));
+    }
+
+    return animeList;
+  }
+
   List<AnimeBean> _getAnimeList(List<Element> elements) {
     final animeList = <AnimeBean>[];
 

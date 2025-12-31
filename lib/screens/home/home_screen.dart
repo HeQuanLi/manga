@@ -4,6 +4,7 @@ import '../../providers/anime_provider.dart';
 import '../../widgets/anime_card.dart';
 import '../../widgets/common_widgets.dart' as common;
 import '../detail/detail_screen.dart';
+import '../category/category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,25 +51,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              section.title
-                                  .replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
+                              section.title.replaceAll(
+                                  RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             if (section.moreUrl.isNotEmpty)
-                              const Text(
-                                '更多>',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CategoryScreen(
+                                        categoryUrl: section.moreUrl,
+                                        categoryTitle: section.title.replaceAll(
+                                            RegExp(r'[^\w\u4e00-\u9fa5]'), ''),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  '查看更多>',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               )
                           ],
