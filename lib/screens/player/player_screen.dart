@@ -27,6 +27,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void initState() {
     super.initState();
+    // 设置横屏方向
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    // 隐藏状态栏和导航栏，提供沉浸式体验
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _loadVideo();
   }
 
@@ -52,9 +59,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
             allowMuting: true,
             showControls: true,
             aspectRatio: _videoPlayerController!.value.aspectRatio,
+            deviceOrientationsOnEnterFullScreen: [
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+            ],
             deviceOrientationsAfterFullScreen: [
-              DeviceOrientation.portraitUp,
-              DeviceOrientation.portraitDown,
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
             ],
             errorBuilder: (context, errorMessage) {
               return Center(
@@ -82,6 +93,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    // 恢复竖屏方向
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    // 恢复系统UI显示
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     super.dispose();
@@ -91,14 +112,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          widget.episodeName,
-          style: const TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: Consumer<AnimeProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && !_isInitialized) {
@@ -150,11 +163,30 @@ class _PlayerScreenState extends State<PlayerScreen> {
             );
           }
 
-          return Center(
-            child: AspectRatio(
-              aspectRatio: _videoPlayerController!.value.aspectRatio,
-              child: Chewie(controller: _chewieController!),
-            ),
+          return Stack(
+            children: [
+              Center(
+                child: AspectRatio(
+                  aspectRatio: _videoPlayerController!.value.aspectRatio,
+                  child: Chewie(controller: _chewieController!),
+                ),
+              ),
+              // 添加返回按钮
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 8,
+                child: SafeArea(
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
